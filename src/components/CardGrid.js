@@ -1,13 +1,13 @@
 import DiaryCard from "./DiaryCard";
 import {Row, Col} from "react-bootstrap";
+import {useState} from "react";
 
-const CardGrid = (diaryNotesList) => {
+const CardGrid = ({diaryNotesList}) => {
     return (
-        <Row className={'justify-content-center'}>
-
-                {
-                    [1, 3, 4, 5].map(i => (<DiaryCard/>))
-                }
+        <Row className={'justify-content-center m-3'}>
+            {
+                [...diaryNotesList].map(i => (<DiaryCard title={i.title} description={i.description} name={i.name}/>))
+            }
         </Row>
     )
 }

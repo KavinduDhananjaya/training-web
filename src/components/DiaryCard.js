@@ -3,13 +3,14 @@ import {useState} from "react";
 
 const DiaryCard = ({title, name, description}) => {
     let isSeeMore = false
-    const [bodyContent, setBody] = useState(description.slice(0, 100) + '...')
-    const [isAllShown, setSeeMore] = useState(isSeeMore)
+    let needSeeMore = description.length>100
+    const [bodyContent, setBodyContent] = useState(needSeeMore ? description.slice(0, 100) + '...' : description)
+    const [isAllShown, setIsAllShown] = useState(isSeeMore)
     const onSeeMoreClick = () => {
-        if (isAllShown) setBody(description.slice(0, 100) + '...')
-        else setBody((description))
+        if (isAllShown && description.length>100) setBodyContent(description.slice(0, 100) + '...')
+        else setBodyContent((description))
 
-        setSeeMore(!isAllShown)
+        setIsAllShown(!isAllShown)
 
     }
     return (
@@ -21,10 +22,14 @@ const DiaryCard = ({title, name, description}) => {
                         <Col>{bodyContent}</Col>
                     </Row>
                     <Row>
-                        <Col>
-                            <Button variant={'link'} onClick={() => onSeeMoreClick()}>
-                                {isAllShown ? 'See less' : 'See more'}
-                            </Button>
+                        <Col className={'see-more'} onClick={() => onSeeMoreClick()}>
+                            {needSeeMore
+                                ? isAllShown ? 'See less' : 'See more'
+                                : ''
+                            }
+                            {/*<Button variant={'link'} onClick={() => onSeeMoreClick()}>*/}
+                            {/*    {isAllShown ? 'See less' : 'See more'}*/}
+                            {/*</Button>*/}
                         </Col>
                     </Row>
                 </Card.Body>
