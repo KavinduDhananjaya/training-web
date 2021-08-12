@@ -1,35 +1,37 @@
-import {useState} from "react";
-import {Col, Container, Row} from "react-bootstrap";
-import NewCardForm from "../components/NewCardForm";
-import CardGrid from "../components/CardGrid";
+import React, { useEffect } from 'react'
+import { CardGroup, Col, Row } from 'react-bootstrap'
+import NewCardForm from '../components/NewCardForm'
+import DiaryCard from '../components/DiaryCard'
 
+import { useDispatch, useSelector } from 'react-redux'
 
-const notes = [
-    {
-        title: "Tisstle",
-        name: 'Jhon Doe',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula odio at diam dictum porttitor. Pellentesque lectus arcu, egestas sit amet mattis a, facilisis non magnac'
-    },
-    {
-        title: "Title",
-        name: 'Jhon Doe',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula odio at diam dictum porttitor. Pellentesque lectus arcu, egestas sit amet mattis a, facilisis non magnac'
-    }
-]
+import { startDiaryNotesFirestoreSync } from '../actions/firestore'
 
-function DiaryHome() {
-    const [diaryNotes, setDiaryNotes] = useState(notes)
-    const addNote = (title, content, author) => {
-        setDiaryNotes([...diaryNotes, {title: title, name: author, description: content}])
-    }
-    return (
-            <Row className={'justify-content-center p-3 vh-100'}>
-                <Col className={'col-12'}>
-                    <NewCardForm onClickAdd={addNote}/>
-                    <CardGrid diaryNotesList={diaryNotes}/>
-                </Col>
-            </Row>
-    );
+function DiaryHome () {
+  const diaryCardsList = useSelector(state => state.diaryCards)
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(startDiaryNotesFirestoreSync())
+  })
+
+  return (
+      <Row className={'justify-content-center p-3 vh-100'}>
+        <Col className={'col-12 overlay'}>
+          <NewCardForm/>
+          <CardGroup className={'justify-content-center m-3'}>
+            {
+              diaryCardsList && diaryCardsList.map(i => (
+                  <DiaryCard
+                      key={i.id}
+                      id={i.id}
+                      title={i.title}
+                      description={i.description}
+                      name={i.name}/>))
+            }
+          </CardGroup>
+        </Col>
+      </Row>
+  )
 }
 
-export default DiaryHome;
+export default DiaryHome

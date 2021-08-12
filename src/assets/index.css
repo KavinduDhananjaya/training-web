@@ -6,7 +6,7 @@
 .diary-card {
     max-width: 24% !important;
     min-width: 300px !important;
-    min-height: 200px!important;
+    min-height: 200px !important;
     border-radius: 10px !important;
 }
 
@@ -81,7 +81,6 @@
 .login-card-header {
     overflow: hidden;
     background: rgba(30, 149, 145, 0.8);
-    padding: 0;
     padding: 5px;
     margin: 0 0 20px;
 }
@@ -89,16 +88,106 @@
 .login-card-header {
     overflow: hidden;
     background: rgba(30, 149, 145, 0.8);
-    padding: 0;
     padding: 5px;
     margin: 0 0 20px;
 }
 
-.login-card-header-fonts{
+.login-card-header-fonts {
     color: #ffffff;
     box-shadow: #61dafb;
 }
 
-.header {
-    position: absolute;
+.card-trash {
+    cursor: pointer;
+    float: right !important;
+}
+
+.card-trash:hover {
+    cursor: pointer;
+    animation: shake 50ms;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+    50% {
+        transform: translate(-3px, 1px) rotate(-2deg);
+    }
+    100% {
+        transform: translate(-2px, -2px) rotate(2deg);
+    }
+}
+
+.hr {
+    height: 2px;
+    background: rgba(30, 149, 145, 0.2);
+    border-radius: 5rem;
+    margin: 5px 0 -10px 0;
+}
+
+
+.top-band {
+    background: linear-gradient(to right top, #0e5b50, #076c5f);
+}
+
+.nav-logo {
+    margin-right: 15px;
+}
+
+.nav-profile-img {
+    margin-left: 10px;
+    height: 40px;
+    width: 40px;
+    background: #61dafb;
+    border-radius: 50%;
+}
+
+.spinner {
+    width: 20px !important;
+    height: 20px !important;
+    color: rgba(97, 218, 251, 0.2);
+    margin-left: 30px
+}
+
+.cards {
+    overflow: scroll;
+    flex-grow: 1;
+}
+
+.no-scroll {
+    position: fixed;
+    overflow: hidden;
+}
+
+.overlay {
+    position: fixed;
+    overflow-y: scroll;
+    top: 10vh;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgba(14, 91, 80, 0.2);
+    border-radius: 15px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    background: rgba(14, 91, 80, 0.2);
+    border-radius: 15px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(14, 91, 80, 0.5);
 }
