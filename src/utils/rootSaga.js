@@ -1,11 +1,11 @@
 import { takeLatest } from 'redux-saga/effects'
-import { ActionTypes } from '../config/constants'
+import { ActionTypes } from './actionTypes'
 import {
   handleFirebasePostsCreate,
   handleFirebasePostsDelete,
   handleFirebasePostsSync
-} from './diaryCardSaga'
-import { handleRandomName } from './loginSaga'
+} from '../Pages/DiaryHome/sagas'
+import { handleRandomName } from '../Pages/Login/sagas'
 
 export function * watchSaga () {
   yield takeLatest(ActionTypes.ADD_DIARY_CARD, handleFirebasePostsCreate)
