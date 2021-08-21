@@ -1,6 +1,10 @@
 //imporing modules
+//importing firebase
+import firebase from "../../utils/firebase";
+import Spinner from 'react-spinkit'
+
 //importing hooks
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import DiaryCard from '../../components/DiaryCard'
 //hook for style material components
 import {
@@ -16,19 +20,23 @@ import {
     Toolbar,
     Typography
 } from '@material-ui/core';
+
+
 //import css files
 import '../../normalize.css'
 import './diaryPage.css'
 //Masonary css for grid
 import Masonry from 'react-masonry-css'
 
+import {connect} from "react-redux";
 
-const dataArr = [] //holds all the card data
-function DiaryHome() {
+function DiaryHome(props) {
 
-    ///Card Data
+    const ref = firebase.firestore().collection("diary-notes")
 
     ///States
+    const [diaryData, setDiaryData] = useState([]);
+
     const [open, setOpen] = useState(false); ///using to handle dialog state
 
     const [color, setColor] = useState({///using to handle form border colors(change to red when errors)
@@ -36,10 +44,24 @@ function DiaryHome() {
         description: "#3498db"
     });
 
-    const [formData, setData] = useState({///using to handle form data
+    const [formData, setFormData] = useState({///using to handle form data
         title: "",
         description: ""
     });
+
+    const [loading, isLoading] = useState(true)
+
+    ///Use-effect using
+    useEffect(() => {
+        ref.onSnapshot((snapshot) => {
+            let items = []
+            snapshot.forEach((doc) => {
+                items.push(doc.data())
+            })
+            setDiaryData(items);
+            isLoading(false)
+        })
+    }, [])
 
     const styles = makeStyles({///Material UI custom stylings
         btn: {
@@ -83,17 +105,17 @@ function DiaryHome() {
 
     function submitForm() { ///Handling the forms errors and submission
 
-        if (formData.title.trim().length == 0 && formData.description.trim().length == 0) {
+        if (formData.title.trim().length === 0 && formData.description.trim().length === 0) {
             setColor(prevState => ({
                 description: "#ff6b6b",
                 title: "#ff6b6b"
             }))
-        } else if (formData.title.trim().length == 0) {
+        } else if (formData.title.trim().length === 0) {
             setColor(prevState => ({
                 title: "#ff6b6b",
                 description: "#3498db",
             }))
-        } else if (formData.description.trim().length == 0) {
+        } else if (formData.description.trim().length === 0) {
             setColor(prevState => ({
                 title: "#3498db",
                 description: "#ff6b6b"
@@ -114,14 +136,37 @@ function DiaryHome() {
             title: formData.title,
             description: formData.description
         }
-
-        dataArr.push(data);
-
         ///After submit all the form data will be cleared from the state
-        setData({
+        setFormData({
             title: "",
             description: ""
         })
+    }
+
+    ///render functions
+    function loader() {
+        // <h1>Loading</h1>
+        if (loading) {
+            return <Spinner name='pacman' color="white"/>
+
+        } else {
+            return <Masonry
+                breakpointCols={breakpoints}
+                className="my-masonry-grid"
+                columnClassName="my-masonry-grid_column"
+            >
+                {
+                    diaryData.map(e => {
+                        return <div className="diary-card">
+                            <DiaryCard
+                                title={e.title}
+                                subtitle={e.name}
+                                description={e.description}/>
+                        </div>
+                    })
+                }
+            </Masonry>
+        }
     }
 
     return (
@@ -148,7 +193,7 @@ function DiaryHome() {
                         <FormControl fullWidth={true}>
                             <TextField
                                 onChange={(e) => {
-                                    setData(prevState => ({
+                                    setFormData(prevState => ({
                                         ...prevState,
                                         title: e.target.value
                                     }))
@@ -169,7 +214,7 @@ function DiaryHome() {
                             <br/>
                             <TextField
                                 onChange={(e) => {
-                                    setData(prevState => ({
+                                    setFormData(prevState => ({
                                         ...prevState,
                                         description: e.target.value
                                     }))
@@ -203,22 +248,9 @@ function DiaryHome() {
                 </Dialog>
             </div>
             <div className="data-grid">
-                <Masonry
-                    breakpointCols={breakpoints}
-                    className="my-masonry-grid"
-                    columnClassName="my-masonry-grid_column"
-                >
-                    {
-                        dataArr.map(e => {
-                            return <div  className="diary-card">
-                                <DiaryCard
-                                    title={e.title}
-                                    subtitle={e.name}
-                                    description={e.description}/>
-                            </div>
-                        })
-                    }
-                </Masonry>
+                {
+                    loader()
+                }
             </div>
             <footer class="footer d-flex">
                 <Typography style={{paddingBottom: 5}} gutterBottom variant="subtitle1">
@@ -228,5 +260,4 @@ function DiaryHome() {
         </div>
     )
 }
-
 export default DiaryHome
