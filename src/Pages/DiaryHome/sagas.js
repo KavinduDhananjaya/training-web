@@ -1,18 +1,60 @@
-import {takeLatest,all,put,fork} from 'redux-saga/effects';
+import {takeLatest,all,put,fork,call,take} from 'redux-saga/effects';
 import { FETCH_ALL_START, ADD_POST_START } from './actionTypes';
 import { getPostSuccess,getPostFail, addPostSuccess, addPostFail } from './actions';
 import firebase from '../../utils/firebase';
+import { eventChannel } from '@redux-saga/core';
+
+// const getPostsAPI = () => {
+//     return new Promise((resolve, reject) => {
+//         firebase.firestore().collection("posts").onSnapshot((snap) => {
+//             let documents = [];
+//             snap.forEach(doc => {
+//                 let result = doc.data();
+//                 documents.push(result);
+//             });
+//             resolve(documents);
+//         });
+//     });
+// };
 
 function* onLoadPostAsync(){
     try {
-        const posts = yield firebase.firestore().collection('posts').get().then((snapshot)=>{
-                const items = [];
-                snapshot.forEach((doc)=>{
-                    items.push(doc.data());
+        const channel = new eventChannel(emiter=>{
+            const listner =firebase.firestore().collection("posts").onSnapshot((snap) => {
+                let documents = [];
+                snap.forEach(doc => {
+                    let result = doc.data();
+                    documents.push(result);
                 });
-                return items;
+                emiter({data:documents||{}})
+
+            });
+            return ()=>{
+                listner.off();
+            };
         });
-        yield put(getPostSuccess([...posts]));
+        while(true){
+            const {data }= yield take(channel);
+            console.log(data);
+            yield put(getPostSuccess(data));
+        }
+
+
+
+        // while (true) {
+        //     const response = yield call(getPostsAPI);
+        //     yield put(getPostSuccess(response));
+        // }
+
+
+        // const posts = yield firebase.firestore().collection('posts').get().then((snapshot)=>{
+        //         const items = [];
+        //         snapshot.forEach((doc)=>{
+        //             items.push(doc.data());
+        //         });
+        //         return items;
+        // });
+        // yield put(getPostSuccess([...posts]));
         
         //this does not work.
 
