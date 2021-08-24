@@ -1,37 +1,46 @@
-import React, {useState} from 'react';
+import React from 'react';
 import TextField from "@material-ui/core/TextField";
 import {makeStyles} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
 /*Styling*/
 const useStyles = makeStyles((theme) => ({
+    container: {
+        position: 'relative',
+        width: '100%',
+        height: 400,
+    },
     root: {
+        position: 'absolute',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#2fb5ef',
         width: 350,
+        left: 20,
+        top: '58%',
+        transform: `translateY(-50%)`,
         '& .MuiTextField-root': {
             margin: theme.spacing(1),
         },
     },
     title: {
-        backgroundColor: '#649ef3',
+        backgroundColor: '#139ade',
         borderRadius: 30,
         '& fieldset': {
-            border: 'none'
-        }
+            border: 'none',
+        },
     },
     description: {
-        backgroundColor: '#649ef3',
+        backgroundColor: '#139ade',
         borderRadius: 8,
         '& fieldset': {
             border: 'none'
         }
     },
     submitButton: {
-        backgroundColor: '#427df3',
+        backgroundColor: '#2271F1EE',
         borderRadius: 20,
         marginBottom: 10,
+        border: 'none',
         '&:hover': {
             backgroundColor: '#1d56c7',
         }
@@ -41,52 +50,42 @@ const useStyles = makeStyles((theme) => ({
 function DiaryHome(props) {
     const classes = useStyles();
 
-    //states
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-
-    //submit button handler
-    function submitHandler() {
-        console.log(`Title: ${title}`);
-        console.log(`Description: ${description}`);
-
-        //clear text fields
-        setTitle('');
-        setDescription('');
+    //prevent form default behaviour
+    function formHandler(event) {
+        event.preventDefault();
     }
 
     return (
-        <form className={classes.root} noValidate autoComplete="off">
-            <TextField
-                id="outlined-basic"
-                variant="outlined"
-                value={title}
-                onChange={(event) => {
-                    setTitle(event.target.value);
-                }}
-                className={classes.title}
-                placeholder='Title'
-            />
-            <TextField
-                id="outlined-multiline-static"
-                multiline
-                rows={4}
-                variant="outlined"
-                value={description}
-                onChange={(event) => {
-                    setDescription(event.target.value);
-                }}
-                className={classes.description}
-                placeholder='Description'
-            />
-            <Button
-                variant='contained'
-                className={classes.submitButton}
-                onClick={submitHandler}
-            >
-                SUBMIT
-            </Button>
-        </form>
+        <div className={classes.container}>
+            <form className={classes.root} noValidate autoComplete="off" onSubmit={formHandler}>
+                <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={props.title}
+                    onChange={props.titleHandler}
+                    className={classes.title}
+                    placeholder='Title'
+                    size="small"
+                />
+                <TextField
+                    id="outlined-multiline-static"
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                    value={props.description}
+                    onChange={props.descriptionHandler}
+                    className={classes.description}
+                    placeholder='Description'
+                />
+                <Button
+                    variant='outlined'
+                    className={classes.submitButton}
+                    onClick={props.submitHandler}
+                >
+                    SUBMIT
+                </Button>
+            </form>
+        </div>
     );
 }
 

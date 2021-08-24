@@ -1,5 +1,6 @@
 .App {
-  display: flex;
-  flex-direction: column;
-  row-gap: 20px;
+    background-image: url("assets/bg2.svg") , linear-gradient(-45deg, #039BE5 0%, #039BE5 33%, #00BCD4 100%);
+    /*background-attachment: fixed;*/
+    min-height: 100vh;
+    min-width: 100vh;
 }
