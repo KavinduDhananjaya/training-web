@@ -1,5 +1,5 @@
 import { Container, Grid, makeStyles } from "@material-ui/core";
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import AddForm from '../../components/add-form/add-form';
 import DiaryCard from '../../components/diary-card/diary-card';
 
@@ -24,50 +24,19 @@ function DiaryHome(props) {
 
     const classes = useStyles();
 
-    const [state, setState] = useState([]);
-    const [input, setInput] = useState({
-        id: 0,
-        title: '',
-        description: ''
-    });
-
-    const handleChange = (event) => {
-        setInput(({
-            ...input, id: state.length, [event.target.name]: event.target.value
-        }));
-    };
-
-    const handleSubmit = () => {
-
-        if (input.title && input.description) {
-            setState([...state, input]);
-
-            setInput({
-                title: '',
-                description: ''
-            });
-        } else {
-            if (!input.title) {
-                console.log("Missing title")
-            }
-            if (!input.description) {
-                console.log("Missing description")
-            }
-        }
-    };
+    const cards = useSelector((state) => state.card);
 
     return (
         <div className={classes.page}>
             <main className={classes.main}>
                 <div className={classes.formContent}>
                     <AddForm
-                        input={input}
-                        handleChange={(event) => handleChange(event)}
-                        handleSubmit={() => handleSubmit()} />
+                        name={props.name}
+                        id={cards.length} />
                 </div>
                 <Container className={classes.cardGrid} maxWidth="xl">
                     <Grid container spacing={4}>
-                        {state.map((card) => (
+                        {cards.map((card) => (
                             <Grid item key={card.id} xs={12} sm={6} md={4} lg={3} xl={3}>
                                 <DiaryCard
                                     title={card.title}

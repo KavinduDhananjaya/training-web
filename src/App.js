@@ -1,11 +1,15 @@
-import DiaryHome from './page/diary-page/diary-page';
+import DiaryHome from './pages/diary-page/diary-page';
 import './App.css';
+import { Provider } from 'react-redux';
+import { store } from './utils/state/store';
 
 function App() {
 
   return (
     <div className="App">
-      <DiaryHome name="Name" />
+      <Provider store={store}>
+        <DiaryHome name="Jhon Doe" />
+      </Provider>
     </div>
   );
 }
