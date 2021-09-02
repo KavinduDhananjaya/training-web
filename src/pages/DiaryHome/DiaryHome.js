@@ -1,10 +1,9 @@
 //imporing modules
 //importing firebase
-import firebase from "../../utils/firebase";
 import Spinner from 'react-spinkit'
 
 //importing hooks
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import DiaryCard from '../../components/DiaryCard'
 //hook for style material components
 import {
@@ -21,21 +20,45 @@ import {
     Typography
 } from '@material-ui/core';
 
+import { motion } from "framer-motion";
 
 //import css files
 import '../../normalize.css'
 import './diaryPage.css'
 //Masonary css for grid
 import Masonry from 'react-masonry-css'
+import { useDispatch, useSelector } from "react-redux";
+import { diaryGet, diaryPost, postListener } from "./redux/diaryAction";
 
-import {connect} from "react-redux";
+//animation variants for the main container of this component
+const containerConstraint = {
+    hidden: {
+        x: "100vw",
+    },
+    visible: {
+        transition: { delay: 1, duration: 1 },
+        x: 0,
+    },
+    exit: {
+        x: '-100vw',
+        transition: { ease: 'easeOut' },
+    }
+}
 
 function DiaryHome(props) {
 
-    const ref = firebase.firestore().collection("diary-notes")
+
+    ///using the dispatcher
+    const dispatch = useDispatch()
+
+    ///nickname from login reducer
+    const nickname = useSelector(state => state.login.nickname)
+
+    ///use this to access the diaryReducer's state
+    const diaryState = useSelector(state => state.diary)
 
     ///States
-    const [diaryData, setDiaryData] = useState([]);
+    // const [diaryData, setDiaryData] = useState(diaryState.diaryData);
 
     const [open, setOpen] = useState(false); ///using to handle dialog state
 
@@ -49,19 +72,16 @@ function DiaryHome(props) {
         description: ""
     });
 
-    const [loading, isLoading] = useState(true)
+    const [loading, isLoading] = useState(diaryState.diaryCardsLoading)
 
-    ///Use-effect using
+    // /Use-effect using to load diary cards from firestore
     useEffect(() => {
-        ref.onSnapshot((snapshot) => {
-            let items = []
-            snapshot.forEach((doc) => {
-                items.push(doc.data())
-            })
-            setDiaryData(items);
-            isLoading(false)
-        })
-    }, [])
+        setTimeout(() => {
+            dispatch(diaryGet())
+        }, 1200)
+    }, []);
+    // setDiaryData(diaryState.diaryData);
+    // dispatch(diaryGet())
 
     const styles = makeStyles({///Material UI custom stylings
         btn: {
@@ -132,10 +152,12 @@ function DiaryHome(props) {
 
     function submitData() {
         const data = {
+            description: formData.description,
             name: "udara",
             title: formData.title,
-            description: formData.description
         }
+        dispatch(diaryPost(data))
+
         ///After submit all the form data will be cleared from the state
         setFormData({
             title: "",
@@ -145,10 +167,8 @@ function DiaryHome(props) {
 
     ///render functions
     function loader() {
-        // <h1>Loading</h1>
-        if (loading) {
-            return <Spinner name='pacman' color="white"/>
-
+        if (diaryState.diaryCardsLoading) {
+            return <Spinner name='pacman' color="white" />
         } else {
             return <Masonry
                 breakpointCols={breakpoints}
@@ -156,13 +176,14 @@ function DiaryHome(props) {
                 columnClassName="my-masonry-grid_column"
             >
                 {
-                    diaryData.map(e => {
-                        return <div className="diary-card">
+                    diaryState.diaryData.map(e => {
+
+                        return (<div className="diary-card">
                             <DiaryCard
                                 title={e.title}
                                 subtitle={e.name}
-                                description={e.description}/>
-                        </div>
+                                description={e.description} />
+                        </div>)
                     })
                 }
             </Masonry>
@@ -170,7 +191,12 @@ function DiaryHome(props) {
     }
 
     return (
-        <div className="diary-container fld-clm">
+        <motion.div
+            variants={containerConstraint}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="diary-container fld-clm">
             <AppBar className="appbar" position="static">
                 <Toolbar>
                 </Toolbar>
@@ -185,7 +211,7 @@ function DiaryHome(props) {
                     fullWidth={true}
                     onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
                     <DialogTitle
-                        style={{color: "#ed4c67"}}
+                        style={{ color: "#ed4c67" }}
                         id="customized-dialog-title" onClose={handleClose}>
                         Add Note
                     </DialogTitle>
@@ -208,10 +234,10 @@ function DiaryHome(props) {
                                         root: clasess.hidden
                                     }
                                 }}
-                                style={{width: "100%"}}
+                                style={{ width: "100%" }}
                                 fullWidth={true}
-                                id="outlined-basic" label="TITLE" variant="outlined"/>
-                            <br/>
+                                id="outlined-basic" label="TITLE" variant="outlined" />
+                            <br />
                             <TextField
                                 onChange={(e) => {
                                     setFormData(prevState => ({
@@ -230,12 +256,12 @@ function DiaryHome(props) {
                                         root: clasess.hidden
                                     }
                                 }}
-                                style={{width: "100%"}}
+                                style={{ width: "100%" }}
                                 fullWidth={true}
                                 multiline={4}
                                 rows={10}
                                 maxRows={10}
-                                id="outlined-basic" label="DESCRIPTION" variant="outlined"/>
+                                id="outlined-basic" label="DESCRIPTION" variant="outlined" />
                         </FormControl>
                     </DialogContent>
                     <DialogActions>
@@ -253,11 +279,11 @@ function DiaryHome(props) {
                 }
             </div>
             <footer class="footer d-flex">
-                <Typography style={{paddingBottom: 5}} gutterBottom variant="subtitle1">
+                <Typography style={{ paddingBottom: 5 }} gutterBottom variant="subtitle1">
                     &copy; 2021 Fcode labs | All the copyrights reserved
                 </Typography>
             </footer>
-        </div>
+        </motion.div>
     )
 }
 export default DiaryHome
